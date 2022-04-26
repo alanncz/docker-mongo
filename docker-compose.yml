@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+
+  mongo:
+    container_name: mongo-db
+    image: mongo:3.6
+    restart: always
+    ports:
+      - 1920:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin-user
+      MONGO_INITDB_ROOT_PASSWORD: admin-password
+      DB_NAME: $DB_NAME
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+    volumes:
+      - db-data:/data/db
+      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+
+  mongo-express:
+    container_name: poc-ia-client-mongo-express
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://admin-user:admin-password@mongo:27017/
+    links:
+      - mongo
+    depends_on:
+      - mongo
+
+volumes:
+  db-data:
